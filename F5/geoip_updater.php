@@ -162,19 +162,30 @@
 				// To install the file
 				for ($g = 0; $g <= (count($Files_arr) - 1); $g++) {
 					$Command = "geoip_update_data -f ".$RemoteDir.$Files_arr[$g];
-					if ($Debug == 1) { echo "Sending command: $Command ... "; }
-					fwrite($shell, "$Command\n"); // send a command
-					sleep(10);
-					echo "Done." . PHP_EOL;
+					if ($Debug == 1) { echo "Sending command: $Command" . PHP_EOL; }
+					fwrite($shell, "$Command\n"); // send command
 					// delete the files after install
-					$Command = "rm ".$RemoteDir.$Files_arr[$g];
-					if ($Debug == 1) { echo "Sending command: $Command ... "; }
-					fwrite($shell, "$Command\n"); // send a command
-					sleep(10);
-					echo "Done." . PHP_EOL;
+					$Command = "rm -f ".$RemoteDir.$Files_arr[$g];
+					if ($Debug == 1) { echo "Sending command: $Command" . PHP_EOL; }
+					fwrite($shell, "$Command\n"); // send command
 				}
 				unset($g);
 			}
+			$Command = 'echo D\O\N\E';
+			if ($Debug == 1) { echo "Sending command: $Command" . PHP_EOL; }
+			fwrite($shell, "$Command\n"); // send command
+			stream_set_blocking($shell, false);
+			$output = '';
+			while (true) {
+				$line = fgets($shell);
+				$output .= $line;
+				//if ($Debug == 1 && $line != "") { echo "$line"; }
+				if (strpos($line, 'DONE') !== false) {
+					// Found the marker, break the loop
+					break;
+				}
+			}
+			if ($Debug == 1) { echo "Output: $output"; }
 			fclose($shell);
 			unset($shell);
 
